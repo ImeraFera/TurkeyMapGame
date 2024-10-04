@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #EAD2AC;
+}
+
+
+
+svg>path:hover {
+  fill: rgb(21, 161, 173);
+}
+
+.success {
+  fill: green;
+}
