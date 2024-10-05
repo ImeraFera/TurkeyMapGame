@@ -142,11 +142,11 @@ io.on('connection', (socket) => {
             user.score += 10;
             console.log(user.username, 'score: ', user.score)
 
-            city = randomCity(unfoundCities);
             console.log('bulunacak olan : ', city);
             const arr = unfoundCities.filter(city => city.id !== cityId)
             unfoundCities = arr;
-            foundCities.push(city);
+            foundCities.push(cityId);
+            city = randomCity(unfoundCities);
             console.log(unfoundCities.length)
 
             io.to(room.roomName).emit('answer', {
@@ -155,7 +155,7 @@ io.on('connection', (socket) => {
                 whoseTurn,
                 correctCity: cityId,
                 players,
-                foundCities,
+                foundList: foundCities,
             })
 
         } else {
@@ -168,7 +168,7 @@ io.on('connection', (socket) => {
                 correctCity: cityId,
                 whoseTurn,
                 players,
-                foundCities,
+                foundList: foundCities,
             })
         }
 
