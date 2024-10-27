@@ -107,10 +107,6 @@ let city = randomCity(unfoundCities);
 
 io.on('connection', (socket) => {
 
-
-
-
-    console.log('whose turn is ', whoseTurn)
     socket.on('ready', ({ user, room }) => {
         const hasRoom = alreadyExistsRoom(rooms, room);
         if (hasRoom) {
@@ -131,9 +127,25 @@ io.on('connection', (socket) => {
 
     socket.on('handle_click', (data) => {
 
+        if (unfoundCities.length == 0) {
+
+            const winnerPlayer = players.sort((a, b) => b.score - a.score)[0];
+            console.log(winnerPlayer);
+            socket.emit('game_over', winnerPlayer)
+            return;
+        }
+
+        if (foundCities.includes(data.choosenCity)) {
+            console.log('bulunmuş olana basıldı')
+            return;
+        }
+
+        console.log(data)
+        foundCities.forEach((city) => console.log(city))
+
         const cityId = data.choosenCity;
         const user = players.find(player => player.username === data.user.username)
-        console.log(user)
+        // console.log(user)
         const room = data.room;
 
         whoseTurn = players.filter(player => player.username !== user.username)[0];
@@ -147,7 +159,7 @@ io.on('connection', (socket) => {
             unfoundCities = arr;
             foundCities.push(cityId);
             city = randomCity(unfoundCities);
-            console.log(unfoundCities.length)
+            // console.log(unfoundCities.length)
 
             io.to(room.roomName).emit('answer', {
                 trueAnswer: true,
@@ -161,7 +173,7 @@ io.on('connection', (socket) => {
         } else {
             user.score -= 5;
             city = randomCity(unfoundCities);
-            console.log('bulunacak olan : ', city);
+            // console.log('bulunacak olan : ', city);
             io.to(room.roomName).emit('answer', {
                 trueAnswer: false,
                 nextCity: city,

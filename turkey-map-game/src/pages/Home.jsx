@@ -5,6 +5,7 @@ import Topbar from '../components/Topbar';
 import { socket } from '../socket'
 import { setCity, setCurrentPlayer, setOtherPlayer, setWhoseTurn } from '../redux/slices/appSlice';
 import TurkeyMap from '../components/TurkeyMap';
+import GameOver from '../components/GameOver';
 
 function updateCityColor(cityId) {
 
@@ -25,8 +26,16 @@ function Home() {
 
     const [city, setcity] = useState(useSelector(({ app }) => app.city))
     const [selectedCityElement, setselectedCityElement] = useState(null);
-
+    const [gameOver, setgameOver] = useState(false);
     useEffect(() => {
+
+        socket.on('game_over', (data) => {
+            console.log('Game Over');
+            console.log(data);
+            setgameOver(true);
+
+        })
+
         socket.on('answer', (data) => {
             console.log(data)
             if (data.trueAnswer) {
@@ -72,72 +81,78 @@ function Home() {
                 choosenCity: cityId,
                 room: room,
             });
-
             socket.emit('set_city');
         }
     }
 
-
-
-
     return (
-        <Grid2
-            container
-            mt={2}
-            spacing={2}
-        >
-            <Grid2
-                size={12}
-                bgcolor={'#9CAFB7'}
-                borderRadius={'1em'}
-
-            >
-                <Topbar
-                    player1={currentPlayer}
-                    player2={otherPlayer}
-                    city={city}
-                ></Topbar>
-
-            </Grid2>
-
-            <Grid2
-                bgcolor={'#9CAFB7'}
-                borderRadius={'1em'}
-                size={12}
-            >
-                <Box
-                    display={'flex'}
-                    justifyContent={'center'}
-                    p={5}
+        <>
+            {gameOver ? (
+                <GameOver player={null}></GameOver>
+            ) : (
+                <Grid2
+                    container
+                    mt={2}
+                    spacing={2}
                 >
+                    <Grid2
+                        size={12}
+                        bgcolor={'#9CAFB7'}
+                        borderRadius={'1em'}
 
-                    <TurkeyMap handleClick={handleClick}
-                        foundList={foundList}
-                    ></TurkeyMap>
-
-                </Box>
-            </Grid2>
-
-            <Grid2
-                size={12}
-            >
-                <Box
-                    display={'flex'}
-                    flexDirection={'row'}
-                    borderRadius={'1em'}
-                    bgcolor={whoseTurn?.username === currentPlayer.username ? 'green' : '#FE938C'}
-                    justifyContent={'center'}
-                    p={2}
-                >
-                    <Typography
-                        variant='h3'
-                        color='white'
                     >
-                        {whoseTurn?.username === currentPlayer.username ? 'Senin Sıran !' : 'Sıra Rakibinde !'}
-                    </Typography>
-                </Box>
-            </Grid2>
-        </Grid2>
+                        <Topbar
+                            player1={currentPlayer}
+                            player2={otherPlayer}
+                            city={city}
+                        ></Topbar>
+
+                    </Grid2>
+
+                    <Grid2
+                        bgcolor={'#9CAFB7'}
+                        borderRadius={'1em'}
+                        size={12}
+                    >
+                        <Box
+                            display={'flex'}
+                            justifyContent={'center'}
+                            p={5}
+                        >
+
+                            <TurkeyMap handleClick={handleClick}
+                                foundList={foundList}
+                            ></TurkeyMap>
+
+                        </Box>
+                    </Grid2>
+
+                    <Grid2
+                        size={12}
+                    >
+                        <Box
+                            display={'flex'}
+                            flexDirection={'row'}
+                            borderRadius={'1em'}
+                            bgcolor={whoseTurn?.username === currentPlayer.username ? 'green' : '#FE938C'}
+                            justifyContent={'center'}
+                            p={2}
+                        >
+                            <Typography
+                                variant='h3'
+                                color='white'
+                            >
+                                {whoseTurn?.username === currentPlayer.username ? 'Senin Sıran !' : 'Sıra Rakibinde !'}
+                            </Typography>
+                        </Box>
+                    </Grid2>
+                </Grid2>
+            )}
+
+
+
+        </>
+
     )
 }
 
